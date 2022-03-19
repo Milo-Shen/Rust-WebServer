@@ -1,4 +1,5 @@
-use std::net::TcpListener;
+use std::io::prelude::*;
+use std::net::{TcpListener, TcpStream};
 
 fn main() {
     // 多线程的 web 服务器
@@ -9,7 +10,13 @@ fn main() {
     //  - 上述例子不是最佳实践
     let listener = TcpListener::bind("127.0.0.1:5000").unwrap();
     for stream in listener.incoming() {
-        let steam = stream.unwrap();
-        println!("Connection established");
+        let stream = stream.unwrap();
+        handle_connection(stream);
     }
+}
+
+fn handle_connection(mut stream: TcpStream) {
+    let mut buffer = [0; 512];
+    stream.read(&mut buffer).unwrap();
+    println!("Request: {}", String::from_utf8_lossy(&buffer[..]))
 }
